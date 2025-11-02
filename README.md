@@ -21,9 +21,13 @@ To set up and run the detection core, execute the following commands:
 Bash
 
 python3 -m venv venv
+
 source venv/bin/activate  # Use .\venv\Scripts\activate on Windows
+
 pip install requests
+
 python ui_validator.py
+
 B. Network Enforcement (FRR Simulation)
 To reproduce the mitigation proof, apply the full configuration files located in the FRR_Configuration directory to the respective Linux VMs. On Router A's vtysh shell, verification is confirmed by running show ip bgp 8.8.8.0/24. The output must show: % Network not in table (Proof of successful security filtering).
 
