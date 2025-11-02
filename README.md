@@ -1,67 +1,31 @@
 🛡️ BGP Security with RPKI Validator: Mitigating Internet Routing Hijacks
-This project implements and demonstrates Route Origin Validation (ROV), a security mechanism that uses cryptography to defend the internet's core routing protocol (BGP) against threats like BGP Hijacking.
+1. Project Overview and Significance
+This project implements and demonstrates Route Origin Validation (ROV), a critical security mechanism designed to defend the internet's core routing protocol, BGP, against threats like BGP Hijacking. BGP is fundamentally vulnerable because it operates on trust, allowing unauthorized parties to announce routes and redirect global traffic. Our project solves this by introducing cryptographic proof (RPKI) into the routing process. We built a hybrid system: a Python UI that detects when a route is cryptographically INVALID, and simulated FRR routers that enforce a policy to reject that specific malicious route, ensuring our network only forwards traffic based on verifiable, cryptographically secure information.
 
-1. Project Overview and Significance (Paragraphs)
-The global network protocol, BGP (Border Gateway Protocol), is built on trust and is fundamentally vulnerable to BGP Hijacking. Our project introduces cryptographic proof (RPKI) into the routing process.
-
-We built a hybrid system that detects when an incoming route is INVALID (lacks authorization) via a Python UI and then enforces a policy on simulated FRR routers to reject that specific malicious route, ensuring our network only forwards traffic based on verifiable, cryptographically secure information.
-
-2. Project Components
+2. Project Components and Technology
 The solution is split into two primary, interconnected environments:
 
 A. I. Detection Core (GUI)
-Role: Cryptographic Validation and Visualization (confirming VALID / INVALID status).
-
-Technology Used: Python 3, Tkinter (GUI), requests (Simulated API Logic).
+This component handles Cryptographic Validation and Visualization. It simulates checking a route's Origin AS against the global RPKI cache, confirming VALID / INVALID status. It utilizes Python 3, the Tkinter (GUI) library, and requests for the simulated API logic.
 
 B. II. Enforcement Core (FRR)
-Role: Network Security Policy Enforcement (blocking the rejected route).
-
-Technology Used: Linux (VMs), FRRouting (FRR), BGP Prefix-List Filtering (Workaround for RPKI rejection).
+This component handles Network Security Policy Enforcement, blocking the rejected route. It utilizes Linux (VMs) running FRRouting (FRR), where BGP is configured with a Prefix-List Filtering workaround to simulate the action of an RPKI rejection.
 
 3. Demonstration & Mitigation Proof
-We prove the mitigation by simulating a hijacking of the globally known 8.8.8.0/24 prefix.
+We prove the mitigation by simulating a hijacking of the globally known 8.8.8.0/24 prefix. Specifically, we test the scenario where an unauthorized AS (65535) attempts to announce this prefix. Our system detects this as ❌ INVALID, and the router successfully REJECTS the route. This action prevents the attack.
 
-Test Case: Attempting to announce 8.8.8.0/24 with an unauthorized AS (65535).
-
-Expected Result: The system returns ❌ INVALID, and the router must REJECT the route.
-
-4. Setup and Run Instructions (Minimal Commands)
+4. Setup and Run Instructions
 A. Python GUI (Detection Core)
-Environment Setup:
+To set up and run the detection core, execute the following commands:
 
 Bash
 
 python3 -m venv venv
-source venv/bin/activate  # or .\venv\Scripts\activate on Windows
+source venv/bin/activate  # Use .\venv\Scripts\activate on Windows
 pip install requests
-Run Application:
-
-Bash
-
 python ui_validator.py
 B. Network Enforcement (FRR Simulation)
-To reproduce the mitigation proof, you must apply the full configuration files located in the FRR_Configuration folder to the respective VMs.
-
-Configuration Files:
-
-VM-A (Policy Enforcer): Uses frr_config_vm_a.txt (Contains the prefix list filter).
-
-VM-B (Malicious Peer): Uses frr_config_vm_b.txt (Configures AS 65535 to announce the hijack route).
-
-Verification: On Router A's vtysh shell:
-
-Check Rejection: Run show ip bgp 8.8.8.0/24.
-
-The output must show: % Network not in table (Proof of successful security filtering).
+To reproduce the mitigation proof, apply the full configuration files located in the FRR_Configuration directory to the respective Linux VMs. On Router A's vtysh shell, verification is confirmed by running show ip bgp 8.8.8.0/24. The output must show: % Network not in table (Proof of successful security filtering).
 
 5. Repository Structure and Author
-Repository Structure:
-
-RPKI_Validator_GUI/ui_validator.py: Python script containing the GUI and simulated RPKI logic.
-
-FRR_Configuration/: Contains router configuration files.
-
-Demonstration_Proofs/: Final snapshots proving RPKI detection and network rejection.
-
-Project_Report.pdf: The final academic submission document.
+The repository includes the necessary files for full reproduction: RPKI_Validator_GUI/ui_validator.py (Python logic), the configuration files within the FRR_Configuration/ directory, the Demonstration_Proofs/ (final snapshots), and the final Project_Report.pdf.
